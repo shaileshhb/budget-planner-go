@@ -1,54 +1,54 @@
 package web
 
 import (
-	"net/http"
 	"net/url"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
+	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 )
 
 // Parser helps in parsing the data from the URL params.
 type Parser struct {
-	Params map[string]string
+	Params gin.Params
 	Form   url.Values
 }
 
 // NewParser will call request.ParseForm() and create a new instance of parser.
-func NewParser(r *http.Request) *Parser {
-	r.ParseForm()
+func NewParser(ctx *gin.Context) *Parser {
+	ctx.Request.ParseForm()
 	return &Parser{
-		Params: mux.Vars(r),
-		Form:   r.Form,
+		Params: ctx.Params,
+		Form:   ctx.Request.Form,
 	}
 }
 
 // GetUUID will get uuid from the given paramName in URL params.
 func (p *Parser) GetUUID(paramName string) (uuid.UUID, error) {
-	return uuid.Parse(p.Params[paramName])
-	// if err != nil {
-	// 	return uuid.Nil, err
-	// }
-	// return id, nil
+	param, ok := p.Params.Get(paramName)
+	if !ok {
+		return uuid.Nil, errors.NewValidationError(param + " not found")
+	}
+	return uuid.Parse(param)
 }
 
 // GetParameter will get parameter from the given paramName in URL params.
 func (p *Parser) GetParameter(paramName string) string {
-	paramString := p.Params[paramName]
+	paramString, ok := p.Params.Get(paramName)
+	if !ok {
+		return ""
+	}
 	return paramString
 }
 
 // GetTenantID will get "tenantID" param in URL params.
 func (p *Parser) GetTenantID() (uuid.UUID, error) {
-	return uuid.Parse(p.Params["tenantID"])
-
-	// idString := p.Params["tenantID"]
-	// id, err := util.ParseUUID(idString)
-	// if err != nil {
-	// 	return uuid.Nil, err
-	// }
-	// return id, nil
+	param, ok := p.Params.Get("tenantID")
+	if !ok {
+		return uuid.Nil, errors.NewValidationError("tenantID not found")
+	}
+	return uuid.Parse(param)
 }
 
 // ParseLimitAndOffset will parse limit and offset from query params.

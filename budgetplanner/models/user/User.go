@@ -10,15 +10,15 @@ import (
 // User will store all the information required of a user.
 type User struct {
 	general.Base
-	Name         string `json:"name" gorm:"type:varchar(100)"`
-	Username     string `json:"username" gorm:"type:varchar(100)"`
-	Email        string `json:"email" gorm:"type:varchar(50)"`
-	Password     string `json:"password" gorm:"type:varchar(50)"`
-	DateOfBirth  string `json:"dateOfBirth" gorm:"type:varchar(10)"`
-	Gender       string `json:"gender" gorm:"type:varchar(20)"`
-	Contact      string `json:"contact" gorm:"type:varchar(15)"`
-	ProfileImage string `json:"profileImage" gorm:"type:varchar(255)"`
-	IsVerified   bool   `json:"isVerified" gorm:"type:tinyint;default:0"`
+	Name         string  `json:"name" gorm:"type:varchar(100)"`
+	Username     string  `json:"username" gorm:"type:varchar(200)" sql:"index"`
+	Email        string  `json:"email" gorm:"type:varchar(255)" sql:"index"`
+	Password     string  `json:"password" gorm:"type:varchar(255)" sql:"index"`
+	DateOfBirth  *string `json:"dateOfBirth" gorm:"type:varchar(10)"`
+	Gender       *string `json:"gender" gorm:"type:varchar(20)"`
+	Contact      *string `json:"contact" gorm:"type:varchar(15)"`
+	ProfileImage *string `json:"profileImage" gorm:"type:varchar(255)"`
+	IsVerified   bool    `json:"isVerified" gorm:"type:tinyint;default:0"`
 }
 
 // TableName will specify table name for user struct.
@@ -69,7 +69,9 @@ func (u *User) Validate() error {
 	}
 
 	u.Password = strings.TrimSpace(u.Password)
-	u.Contact = strings.TrimSpace(u.Contact)
+	if u.Contact != nil {
+		*u.Contact = strings.TrimSpace(*u.Contact)
+	}
 
 	return nil
 }

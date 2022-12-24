@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/log"
+	userModal "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/security"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/user/service"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/web"
@@ -38,6 +38,31 @@ func (c *authenticationController) RegisterRoutes(router *gin.Engine) {
 }
 
 func (c *authenticationController) register(ctx *gin.Context) {
-	fmt.Println("================ register called ================")
-	web.RespondJSON(ctx, http.StatusOK, "hello world!!")
+	c.log.Info("================ register called ================")
+	// parser := web.NewParser(ctx)
+
+	user := userModal.User{}
+
+	err := web.UnmarshalJSON(ctx.Request, &user)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = user.Validate()
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = c.service.Register(&user)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	web.RespondJSON(ctx, http.StatusOK, user)
 }

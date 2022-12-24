@@ -48,15 +48,13 @@ func main() {
 		&wg, midlware, false, repository)
 
 	module.CreateRouterInstance(app, repository)
+	module.Configure(app)
 
 	err := app.Start()
 	if err != nil {
 		log.Fatal(err)
 		stopApp(app)
 	}
-
-	// app.TableMigration()
-	module.Configure(app)
 
 	// Stop Server On System Call or Interrupt.
 	ch := make(chan os.Signal, 1)
