@@ -12,6 +12,7 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -33,5 +34,6 @@ require (
 
 require (
 	github.com/gookit/color v1.5.2
+	github.com/gorilla/mux v1.8.0
 	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 )
