@@ -11,10 +11,10 @@ import (
 )
 
 // GenerateToken take userID, email, tablename as Role  Return Token
-func (auth *Authentication) generateToken(claims jwt.MapClaims) (string, error) {
+func (auth *Authentication) generateToken(claims jwt.Claims) (string, error) {
 
 	// NewWithClaims returns token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
 	// access token string based on token
 	tokenString, err := token.SignedString([]byte(auth.Config.GetString(config.JWTKey)))
@@ -30,12 +30,23 @@ func (auth *Authentication) GenerateLoginToken(userID, name, email string) (stri
 
 	// Create a claims map
 	// claims based on which token should be created
-	claims := jwt.MapClaims{
-		"userID":  userID,
-		"name":    name,
-		"emailID": email,
-		"exp":     time.Now().Add(time.Hour * 20).Unix(),
+	// claims := jwt.MapClaims{
+	// 	"userID":  userID,
+	// 	"name":    name,
+	// 	"emailID": email,
+	// 	"exp":     time.Now().Add(time.Hour * 20).Unix(),
+	// }
+
+	registeredClaims := jwt.RegisteredClaims{
+		Issuer:  "budget-planner",
+		Subject: "login",
+		Audience: jwt.ClaimStrings{
+			name, email,
+		},
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 20)),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		ID:        userID,
 	}
 
-	return auth.generateToken(claims)
+	return auth.generateToken(registeredClaims)
 }
