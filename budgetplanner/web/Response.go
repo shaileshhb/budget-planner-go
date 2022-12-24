@@ -1,62 +1,73 @@
 package web
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 )
 
 // RespondJSON Make response with json formate.
-func RespondJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, error := json.Marshal(payload)
-	if error != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(error.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write([]byte(response))
+func RespondJSON(ctx *gin.Context, code int, payload interface{}) {
+	// response, err := json.Marshal(payload)
+	// if err != nil {
+	// 	// w.WriteHeader(http.StatusInternalServerError)
+	// 	// w.Write([]byte(error.Error()))
+	// 	ctx.JSON(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(code)
+	// w.Write([]byte(response))
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(code, payload)
 }
 
 // RespondJSONWithXTotalCount Make response with json format and add X-Total-Count header.
-func RespondJSONWithXTotalCount(w http.ResponseWriter, code int, count int, payload interface{}) {
-	response, error := json.Marshal(payload)
-	if error != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(error.Error()))
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	SetNewHeader(w, "X-Total-Count", strconv.Itoa(count))
-	w.WriteHeader(code)
-	w.Write([]byte(response))
+func RespondJSONWithXTotalCount(ctx *gin.Context, code int, count int, payload interface{}) {
+	// response, err := json.Marshal(payload)
+	// if err != nil {
+	// 	// w.WriteHeader(http.StatusInternalServerError)
+	// 	// w.Write([]byte(error.Error()))
+	// 	ctx.JSON(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// w.Header().Set("Content-Type", "application/json")
+	// SetNewHeader(w, "X-Total-Count", strconv.Itoa(count))
+	// w.WriteHeader(code)
+	// w.Write([]byte(response))
+
+	SetNewHeader(ctx, "X-Total-Count", strconv.Itoa(count))
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(code, payload)
 }
 
 // RespondErrorMessage make error response with payload.
-func RespondErrorMessage(w http.ResponseWriter, code int, msg string) {
-	RespondJSON(w, code, map[string]string{"error": msg})
+func RespondErrorMessage(ctx *gin.Context, code int, msg string) {
+	RespondJSON(ctx, code, map[string]string{"error": msg})
 }
 
 // RespondError check error type and Write to ResponseWriter.
-func RespondError(w http.ResponseWriter, err error) {
+func RespondError(ctx *gin.Context, err error) {
 	switch err.(type) {
 	case *errors.ValidationError:
-		RespondJSON(w, http.StatusBadRequest, err)
+		RespondJSON(ctx, http.StatusBadRequest, err)
 	case *errors.HTTPError:
 		httpError := err.(*errors.HTTPError)
-		RespondJSON(w, httpError.HTTPStatus, httpError.ErrorKey)
+		RespondJSON(ctx, httpError.HTTPStatus, httpError.ErrorKey)
 	default:
-		RespondErrorMessage(w, http.StatusInternalServerError, err.Error())
+		RespondErrorMessage(ctx, http.StatusInternalServerError, err.Error())
 	}
 }
 
 // SetNewHeader will expose and set the given headerName and value
 //
 //	SetNewHeader(w,"total","10") will set header "total" : "10"
-func SetNewHeader(w http.ResponseWriter, headerName, value string) {
-	w.Header().Add("Access-Control-Expose-Headers", headerName)
-	w.Header().Set(headerName, value)
+func SetNewHeader(ctx *gin.Context, headerName, value string) {
+	// w.Header().Add("Access-Control-Expose-Headers", headerName)
+	// w.Header().Set(headerName, value)
+
+	// ctx.Header("Access-Control-Expose-Headers", headerName)
+	ctx.Header(headerName, value)
 }

@@ -8,16 +8,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// Authentication service provides methods to update, delete, add, get method for Authentication.
-type Authentication struct {
+type AuthenticationService interface {
+	Register(user *userModal.User) error
+}
+
+// AuthenticationService service provides methods to update, delete, add, get method for AuthenticationService.
+type authenticationService struct {
 	db   *gorm.DB
 	repo repository.Repository
 	auth *security.Authentication
 }
 
-// create new difficulty serviec
-func NewAuthentication(db *gorm.DB, repo repository.Repository, auth *security.Authentication) *Authentication {
-	return &Authentication{
+// NewAuthenticationService create new AuthenticationService
+func NewAuthenticationService(db *gorm.DB, repo repository.Repository, auth *security.Authentication) AuthenticationService {
+	return &authenticationService{
 		db:   db,
 		repo: repo,
 		auth: auth,
@@ -25,7 +29,7 @@ func NewAuthentication(db *gorm.DB, repo repository.Repository, auth *security.A
 }
 
 // Register will register new user in the system.
-func (ser *Authentication) Register(user *userModal.User) error {
+func (ser *authenticationService) Register(user *userModal.User) error {
 
 	err := ser.validateUser(user)
 	if err != nil {
@@ -52,7 +56,7 @@ func (ser *Authentication) Register(user *userModal.User) error {
 }
 
 // validateUser will check if it is unique user.
-func (ser *Authentication) validateUser(user *userModal.User) error {
+func (ser *authenticationService) validateUser(user *userModal.User) error {
 	exist, err := repository.DoesRecordExist(ser.db, userModal.User{}, repository.Filter("users.`id` != ?"+
 		" AND users.`email` = ? AND users.`username` = ?", user.ID, user.Email, user.Username))
 	if err != nil {

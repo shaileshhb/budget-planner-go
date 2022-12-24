@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/mux"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/config"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/log"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/repository"
@@ -18,7 +18,7 @@ import (
 
 // Controller is implemented by the controllers.
 type Controller interface {
-	RegisterRoutes(router *mux.Router)
+	RegisterRoutes(router *gin.Engine)
 }
 
 // ModuleConfig needs to be implemented by every module.
@@ -31,6 +31,7 @@ type App struct {
 	sync.Mutex
 	Name           string
 	Engine         *gin.Engine
+	RouterGroup    *gin.RouterGroup
 	DB             *gorm.DB
 	Log            log.Logger
 	Config         config.ConfReader
@@ -63,22 +64,27 @@ func NewApp(name string, db *gorm.DB, log log.Logger, conf config.ConfReader, wg
 func (app *App) InitializeRouter() {
 	app.Log.Info(app.Name + " App Route initializing")
 
-	app.Engine = gin.Default()
+	// app.Engine = gin.Default()
+
+	app.Engine = gin.New()
+
 	app.initializeServer()
 }
 
 // initializeServer will initialize server with the given config.
 func (app *App) initializeServer() {
-	// headers := handlers.AllowedHeaders([]string{
-	// 	"Content-Type", "X-Total-Count", "token",
-	// })
-	// methods := handlers.AllowedMethods([]string{
-	// 	http.MethodPost, http.MethodPut, http.MethodGet, http.MethodDelete, http.MethodOptions,
-	// })
+	app.Engine.Use(gin.Recovery())
+	app.Engine.Use(gin.Logger())
 
-	// originOption := handlers.AllowedOriginValidator(app.checkOrigin)
-
-	app.Engine.SetTrustedProxies([]string{"127.0.0.1:4200"})
+	app.Engine.Use(cors.New(cors.Config{
+		AllowOriginFunc: app.checkOrigin,
+		AllowMethods: []string{
+			http.MethodPost, http.MethodPut, http.MethodGet, http.MethodDelete, http.MethodOptions,
+		},
+		AllowHeaders: []string{
+			"Content-Type", "X-Total-Count", "Authorization",
+		},
+	}))
 }
 
 func (app *App) checkOrigin(origin string) bool {
@@ -88,18 +94,24 @@ func (app *App) checkOrigin(origin string) bool {
 	}
 	fmt.Println("=====APP is in production:======")
 
-	return true
+	switch origin {
+	case "https://shaileshhb.github.io/budget-planner-frontend":
+		return true
+	}
+
+	return false
 }
 
 // RegisterControllerRoutes will register the specified routes in controllers.
 func (app *App) RegisterControllerRoutes(controllers []Controller) {
 	app.Lock()
 	defer app.Unlock()
+
 	// controllers registering routes.
-	// for _, controller := range controllers {
-	// Can't use go routines as gorilla mux doesn't support it.
-	// controller.RegisterRoutes(app.Router.NewRoute().Subrouter())
-	// }
+	for _, controller := range controllers {
+		// need to check if gin can register routes using go routine
+		controller.RegisterRoutes(app.Engine)
+	}
 }
 
 // MigrateTables will do a table table migration for all modules.
