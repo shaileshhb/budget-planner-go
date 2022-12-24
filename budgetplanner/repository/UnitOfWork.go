@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 // UnitOfWork represent connection
 type UnitOfWork struct {
 	DB        *gorm.DB
-	Committed bool
+	committed bool
 }
 
 // NewUnitOfWork creates new instance of UnitOfWork.
@@ -14,14 +14,14 @@ func NewUnitOfWork(db *gorm.DB) *UnitOfWork {
 
 	return &UnitOfWork{
 		DB:        db.Begin(),
-		Committed: commit,
+		committed: commit,
 	}
 }
 
 // Commit use to commit after a successful transaction.
 func (uow *UnitOfWork) Commit() {
-	if !uow.Committed {
-		uow.Committed = true
+	if !uow.committed {
+		uow.committed = true
 		uow.DB.Commit()
 	}
 }
@@ -30,7 +30,7 @@ func (uow *UnitOfWork) Commit() {
 func (uow *UnitOfWork) RollBack() {
 	// This condition can be used if Rollback() is defered as soon as UOW is created.
 	// So we only rollback if it's not committed.
-	if !uow.Committed {
+	if !uow.committed {
 		uow.DB.Rollback()
 	}
 }

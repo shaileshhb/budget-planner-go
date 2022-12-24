@@ -159,6 +159,45 @@ func (repository *GormRepository) Scan(uow *UnitOfWork, out interface{}, queryPr
 	return db.Scan(out).Error
 }
 
+// Filter will filter the results based on condition.
+//
+//	Filter("name= ?","Ramesh")
+//
+// Query : WHERE `name`= "Ramesh"
+func Filter(condition string, args ...interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		db = db.Debug().Where(condition, args...)
+		return db, nil
+	}
+}
+
+// CombineQueries will process slice of queryprocessors and return single queryprocessor.
+func CombineQueries(queryProcessors []QueryProcessor) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		tempDB, err := executeQueryProcessors(db, out, queryProcessors...)
+		return tempDB, err
+	}
+}
+
+// DoesRecordExist returns true if the record exists.
+//
+//	If ID is to be checked then populate it in the model
+func DoesRecordExist(db *gorm.DB, out interface{}, queryProcessors ...QueryProcessor) (bool, error) {
+	var count int64 = 0
+	db, err := executeQueryProcessors(db, out, queryProcessors...)
+	if err != nil {
+		return false, err
+	}
+
+	if err := db.Debug().Model(out).Count(&count).Error; err != nil {
+		return false, err
+	}
+	if count <= 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
 // executeQueryProcessors executes all queryProcessor func.
 func executeQueryProcessors(db *gorm.DB, out interface{}, queryProcessors ...QueryProcessor) (*gorm.DB, error) {
 	var err error

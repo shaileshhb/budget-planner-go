@@ -30,11 +30,11 @@ func main() {
 		log.Fatal("Db connection failed.")
 	}
 	defer func() {
-		// sqlDB, err := db.DB()
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// sqlDB.Close()
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Fatal(err)
+		}
+		sqlDB.Close()
 		// db.Close()
 		log.Info("Db closed")
 	}()
@@ -49,12 +49,11 @@ func main() {
 
 	module.CreateRouterInstance(app, repository)
 
-	go func() {
-		err := app.Start()
-		if err != nil {
-			stopApp(app)
-		}
-	}()
+	err := app.Start()
+	if err != nil {
+		log.Fatal(err)
+		stopApp(app)
+	}
 
 	// app.TableMigration()
 	module.Configure(app)
@@ -64,7 +63,6 @@ func main() {
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	<-ch
 	stopApp(app)
-
 }
 
 func stopApp(app *budgetplanner.App) {
