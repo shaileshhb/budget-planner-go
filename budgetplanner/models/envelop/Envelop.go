@@ -6,14 +6,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/models/general"
+	userModel "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 )
 
 // Envelop will consist of data related to user envelops.
 type Envelop struct {
 	general.Base
-	Name   string    `json:"name" gorm:"type:varchar(100);not_null"`
-	UserID uuid.UUID `json:"userID" gorm:"type:char(36);index:idx_user_id"`
-	Amount float64   `json:"amount" gorm:"type:decimal(10, 2);not_null"`
+	Name   string         `json:"name" gorm:"type:varchar(100);not_null"`
+	User   userModel.User `json:"-" gorm:"foreignKey:UserID"` // added to create foregin key. can't create using constraint
+	UserID uuid.UUID      `json:"userID" gorm:"type:char(36);index:idx_user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Amount float64        `json:"amount" gorm:"type:decimal(10, 2);not_null"`
 }
 
 // TableName will specify table name for envelop struct.

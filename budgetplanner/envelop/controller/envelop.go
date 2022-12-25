@@ -46,8 +46,6 @@ func (c *envelopController) RegisterRoutes(router *gin.RouterGroup) {
 	guarded.PUT("/:userID/envelops/:envelopID", c.updateEnvelop)
 	guarded.DELETE("/:userID/envelops/:envelopID", c.deleteEnvelop)
 	guarded.GET("/:userID/envelops", c.getEnvelops)
-
-	c.log.Info(" === Envelop routes registered === ")
 }
 
 // addEnvelop will add new envelop for specified user.
@@ -188,5 +186,5 @@ func (c *envelopController) getEnvelops(ctx *gin.Context) {
 		return
 	}
 
-	web.RespondJSON(ctx, http.StatusOK, nil)
+	web.RespondJSON(ctx, http.StatusOK, envelops)
 }
