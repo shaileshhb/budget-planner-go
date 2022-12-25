@@ -1,4 +1,4 @@
-package envelop
+package account
 
 import (
 	"strings"
@@ -9,43 +9,42 @@ import (
 	userModel "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 )
 
-// Envelop will consist of data related to user envelops.
-type Envelop struct {
+// Account consist of all details regarding user accounts
+type Account struct {
 	general.Base
 	Name   string         `json:"name" gorm:"type:varchar(100);not_null"`
 	User   userModel.User `json:"-" gorm:"foreignKey:UserID"` // added to create foregin key. can't create using constraint
 	UserID uuid.UUID      `json:"userID" gorm:"type:char(36);index:idx_user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Amount float64        `json:"amount" gorm:"type:decimal(10, 2);not_null"`
-	// add account id to table
+	Amount float64        `json:"amount" gorm:"type:decimal(10,2);not_null"`
 }
 
 // TableName will specify table name for envelop struct.
-func (*Envelop) TableName() string {
-	return "envelops"
+func (*Account) TableName() string {
+	return "accounts"
 }
 
 // Validate will verify compulsory fields of envelop.
-func (e *Envelop) Validate() error {
+func (a *Account) Validate() error {
 
-	if len(strings.TrimSpace(e.Name)) == 0 {
-		return errors.NewValidationError("envelop name must be specified")
+	if len(strings.TrimSpace(a.Name)) == 0 {
+		return errors.NewValidationError("account name must be specified")
 	}
 
-	e.Name = strings.TrimSpace(e.Name)
+	a.Name = strings.TrimSpace(a.Name)
 
-	if e.UserID == uuid.Nil {
+	if a.UserID == uuid.Nil {
 		return errors.NewValidationError("user must be specified")
 	}
 
-	if e.Amount == 0 {
+	if a.Amount == 0 {
 		return errors.NewValidationError("amount must be greater than 0")
 	}
 
 	return nil
 }
 
-// EnvelopDTO contains fields for DTO specifically.
-type EnvelopDTO struct {
+// AccountDTO contains fields for DTO specifically.
+type AccountDTO struct {
 	general.BaseDTO
 	Name   string    `json:"name"`
 	UserID uuid.UUID `json:"userID"`
@@ -53,6 +52,6 @@ type EnvelopDTO struct {
 }
 
 // TableName will specify table name for envelop struct.
-func (*EnvelopDTO) TableName() string {
-	return "envelops"
+func (*AccountDTO) TableName() string {
+	return "accounts"
 }
