@@ -12,8 +12,8 @@ type Repository interface {
 	GetRecord(uow *UnitOfWork, out interface{}, queryProcessors ...QueryProcessor) error
 	GetAllInOrder(uow *UnitOfWork, out, orderBy interface{}, queryProcessor ...QueryProcessor) error
 
-	GetCount(uow *UnitOfWork, out, count *int64, queryProcessors ...QueryProcessor) error
-	GetCountUnscoped(uow *UnitOfWork, out, count *int64, queryProcessors ...QueryProcessor) error
+	GetCount(uow *UnitOfWork, out interface{}, count *int64, queryProcessors ...QueryProcessor) error
+	GetCountUnscoped(uow *UnitOfWork, out interface{}, count *int64, queryProcessors ...QueryProcessor) error
 
 	// Other CRUD operations.
 	Add(uow *UnitOfWork, out interface{}) error
@@ -83,7 +83,7 @@ func (repository *GormRepository) GetAllInOrder(uow *UnitOfWork, out, orderBy in
 }
 
 // GetCount gives number of records in database.
-func (repository *GormRepository) GetCount(uow *UnitOfWork, out, count *int64, queryProcessors ...QueryProcessor) error {
+func (repository *GormRepository) GetCount(uow *UnitOfWork, out interface{}, count *int64, queryProcessors ...QueryProcessor) error {
 	db := uow.DB
 	db, err := executeQueryProcessors(db, out, queryProcessors...)
 	if err != nil {
@@ -93,7 +93,7 @@ func (repository *GormRepository) GetCount(uow *UnitOfWork, out, count *int64, q
 }
 
 // GetCountUnscoped gives number of records in database.
-func (repository *GormRepository) GetCountUnscoped(uow *UnitOfWork, out, count *int64, queryProcessors ...QueryProcessor) error {
+func (repository *GormRepository) GetCountUnscoped(uow *UnitOfWork, out interface{}, count *int64, queryProcessors ...QueryProcessor) error {
 	db := uow.DB.Unscoped()
 	db, err := executeQueryProcessors(db, out, queryProcessors...)
 	if err != nil {
@@ -157,6 +157,50 @@ func (repository *GormRepository) Scan(uow *UnitOfWork, out interface{}, queryPr
 		return err
 	}
 	return db.Scan(out).Error
+}
+
+// ******************************** All GormRepository methods above this line ********************************
+
+// OrderBy specifies order when retrieving records from database, set reorder to `true` to overwrite defined conditions
+//
+//	Order("name DESC")
+func OrderBy(value interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		db = db.Order(value)
+		return db, nil
+	}
+}
+
+// Select specify fields that you want to retrieve from database when querying, by default, will select all fields;
+// When creating/updating, specify fields that you want to save to database.
+func Select(query interface{}, args ...interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		db = db.Select(query, args...)
+		return db, nil
+	}
+}
+
+// Join specifies join conditions as query processors. (Use Find() or something similar to get results)
+//
+//	Joins("JOIN emails ON emails.user_id = users.id AND emails.email = ?", "tsam@example.org")
+func Join(query string, args ...interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		db = db.Joins(query, args...)
+		return db, nil
+	}
+}
+
+// Model specifies the model you would like to run db operations on
+//
+//	// update all users's name to `hello`
+//	db.Model(&User{}).Update("name", "hello")
+//	// if user's primary key is non-blank, will use it as condition, then will only update the user's name to `hello`
+//	db.Model(&user).Update("name", "hello")
+func Model(value interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		db = db.Debug().Model(value)
+		return db, nil
+	}
 }
 
 // Filter will filter the results based on condition.

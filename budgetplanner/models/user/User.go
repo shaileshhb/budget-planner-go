@@ -11,8 +11,8 @@ import (
 type User struct {
 	general.Base
 	Name         string  `json:"name" gorm:"type:varchar(100)"`
-	Username     string  `json:"username" gorm:"type:varchar(200);index:idx_username"`
-	Email        string  `json:"email" gorm:"type:varchar(255);index:idx_email"`
+	Username     string  `json:"username" gorm:"type:varchar(200);unique;index:idx_username"`
+	Email        string  `json:"email" gorm:"type:varchar(255);unique;index:idx_email"`
 	Password     string  `json:"password" gorm:"type:varchar(255);index:idx_password"`
 	DateOfBirth  *string `json:"dateOfBirth" gorm:"type:varchar(10)"`
 	Gender       *string `json:"gender" gorm:"type:varchar(20)"`
@@ -26,7 +26,7 @@ func (*User) TableName() string {
 	return "users"
 }
 
-// User contains fields for DTO specifically.
+// UserDTO contains fields for DTO specifically.
 type UserDTO struct {
 	general.BaseDTO
 	Name         string `json:"name"`
@@ -45,6 +45,7 @@ func (*UserDTO) TableName() string {
 	return "users"
 }
 
+// Validate will verify compulsory fields of user.
 func (u *User) Validate() error {
 	if len(strings.TrimSpace(u.Name)) == 0 {
 		return errors.NewValidationError("name must be specified")
@@ -82,6 +83,7 @@ type Login struct {
 	Password string `json:"password"`
 }
 
+// Validate will verify compulsory fields of login.
 func (l *Login) Validate() error {
 	if len(strings.TrimSpace(l.Username)) == 0 {
 		return errors.NewValidationError("username must be specified")

@@ -18,7 +18,7 @@ import (
 
 // Controller is implemented by the controllers.
 type Controller interface {
-	RegisterRoutes(router *gin.Engine)
+	RegisterRoutes(router *gin.RouterGroup)
 }
 
 // ModuleConfig needs to be implemented by every module.
@@ -64,10 +64,7 @@ func NewApp(name string, db *gorm.DB, log log.Logger, conf config.ConfReader, wg
 func (app *App) InitializeRouter() {
 	app.Log.Info(app.Name + " App Route initializing")
 
-	// app.Engine = gin.Default()
-
 	app.Engine = gin.New()
-
 	app.initializeServer()
 }
 
@@ -92,7 +89,6 @@ func (app *App) checkOrigin(origin string) bool {
 	if !app.IsInProduction {
 		return true
 	}
-	fmt.Println("=====APP is in production:======")
 
 	switch origin {
 	case "https://shaileshhb.github.io/budget-planner-frontend":
@@ -110,7 +106,7 @@ func (app *App) RegisterControllerRoutes(controllers []Controller) {
 	// controllers registering routes.
 	for _, controller := range controllers {
 		// need to check if gin can register routes using go routine
-		controller.RegisterRoutes(app.Engine)
+		controller.RegisterRoutes(app.Engine.Group("/api/v1/budget-planner"))
 	}
 }
 

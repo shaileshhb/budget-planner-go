@@ -8,9 +8,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/config"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/log"
+	userModel "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/web"
 	"gorm.io/gorm"
 )
@@ -20,6 +22,7 @@ type Authentication struct {
 	db                      *gorm.DB
 	Config                  config.ConfReader
 	authorizationTypeBearer string
+	authorizationClaims     string
 }
 
 // NewAuthentication returns new instance of Authentication
@@ -28,6 +31,7 @@ func NewAuthentication(db *gorm.DB, config config.ConfReader) *Authentication {
 		db:                      db,
 		Config:                  config,
 		authorizationTypeBearer: "bearer",
+		authorizationClaims:     "authorizationClaims",
 	}
 }
 
@@ -57,7 +61,7 @@ func (auth *Authentication) Middleware() gin.HandlerFunc {
 		}
 
 		accessToken := fields[1]
-		claims := jwt.RegisteredClaims{}
+		claims := userModel.Claims{}
 
 		payload, err := jwt.ParseWithClaims(
 			accessToken, &claims,
@@ -79,7 +83,7 @@ func (auth *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		if claims.VerifyExpiresAt(time.Now(), true) {
+		if !claims.VerifyExpiresAt(time.Now(), true) {
 			log.GetLogger().Error("Session expired! Please login again")
 			web.RespondErrorMessage(ctx, http.StatusUnauthorized, "Session expired! Please login again")
 			return
@@ -90,6 +94,8 @@ func (auth *Authentication) Middleware() gin.HandlerFunc {
 		// 	fmt.Printf("Key: %v, value: %v\n", key, val)
 		// }
 
+		fmt.Printf("Key: userID, value: %v\n", claims.UserID)
+
 		// if token is valid then it will be redirected to the endpoint
 		if payload.Valid {
 			if ctx.Request.Method == "OPTION" {
@@ -98,73 +104,24 @@ func (auth *Authentication) Middleware() gin.HandlerFunc {
 				return
 			}
 
+			ctx.Set(auth.authorizationClaims, claims)
+
 			ctx.Next()
 			return
 		}
 	}
 }
 
-// Middleware will fetch jwt token from header and verify it.
-// func (auth *Authentication) Middleware(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// ExtractUserID will extract userID from payload.
+func (auth *Authentication) ExtractUserID(ctx *gin.Context) (uuid.UUID, error) {
 
-// 		// tokenStr, err := request.HeaderExtractor{"Authorization"}.ExtractToken(r)
+	var claims userModel.Claims
 
-// 		tokenStr := r.Header.Get("Authorization")
-// 		if len(tokenStr) == 0 {
-// 			log.GetLogger().Error("Token must be specified")
-// 			web.RespondError(ctx, errors.NewHTTPError("Token must be specified", http.StatusUnauthorized))
-// 			return
-// 		}
+	payload, ok := ctx.Get(auth.authorizationClaims)
+	if !ok {
+		return uuid.Nil, errors.NewValidationError("claims not found.")
+	}
 
-// claims := jwt.RegisteredClaims{}
-
-// token, err := jwt.ParseWithClaims(
-// 	tokenStr, &claims,
-// 	func(token *jwt.Token) (interface{}, error) {
-// 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-// 			return nil, errors.NewHTTPError(errors.ErrorCodeInternalError, http.StatusInternalServerError)
-// 		}
-// 		return []byte(auth.Config.GetString(config.JWTKey)), nil
-// 	})
-
-// if err != nil {
-// 	if err == jwt.ErrSignatureInvalid {
-// 		log.GetLogger().Error(err.Error())
-// 		web.RespondError(w, errors.NewHTTPError(err.Error(), http.StatusUnauthorized))
-// 		return
-// 	}
-
-// 	log.GetLogger().Error(err.Error())
-// 	web.RespondError(w, errors.NewHTTPError(err.Error(), http.StatusBadRequest))
-// 	return
-// }
-
-// if claims.VerifyExpiresAt(time.Now(), true) {
-// 	log.GetLogger().Error("Session expired! Please login again")
-// 	web.RespondError(w, errors.NewHTTPError("Session expired! Please login again", http.StatusUnauthorized))
-// 	return
-// }
-
-// 		// prints all the claims
-// 		// for key, val := range claims {
-// 		// 	fmt.Printf("Key: %v, value: %v\n", key, val)
-// 		// }
-
-// 		// if token is valid then it will be redirected to the endpoint
-// 		if token.Valid {
-// 			if r.Method == "OPTION" {
-// 				w.WriteHeader(http.StatusOK)
-// 				return
-// 			}
-
-// 			next.ServeHTTP(w, r)
-// 			return
-// 		}
-
-// 		// returns error if token is not valid
-// 		log.GetLogger().Error(err.Error())
-// 		web.RespondError(w, errors.NewHTTPError("Session expired!!!!", http.StatusUnauthorized))
-// 		return
-// 	})
-// }
+	claims = payload.(userModel.Claims)
+	return claims.UserID, nil
+}

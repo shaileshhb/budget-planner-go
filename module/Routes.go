@@ -14,8 +14,10 @@ func CreateRouterInstance(app *budgetplanner.App, repository repository.Reposito
 
 	app.InitializeRouter()
 
-	app.WG.Add(1)
+	app.WG.Add(2)
 
 	go registerUserRoutes(app, repository)
+	go registerEnvelopRoutes(app, repository)
+
 	app.WG.Wait()
 }

@@ -11,19 +11,23 @@ import (
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/web"
 )
 
+// AuthenticationController service provides methods to update, delete, add, get method for AuthenticationController.
 type AuthenticationController interface {
-	RegisterRoutes(router *gin.Engine)
+	RegisterRoutes(router *gin.RouterGroup)
 	register(ctx *gin.Context)
 	login(ctx *gin.Context)
 }
 
+// authenticationController.
 type authenticationController struct {
 	service service.AuthenticationService
 	log     log.Logger
 	auth    *security.Authentication
 }
 
-func NewAuthenticationController(ser service.AuthenticationService, log log.Logger, auth *security.Authentication) AuthenticationController {
+// NewAuthenticationController create new AuthenticationController
+func NewAuthenticationController(ser service.AuthenticationService, log log.Logger,
+	auth *security.Authentication) AuthenticationController {
 	return &authenticationController{
 		service: ser,
 		log:     log,
@@ -32,11 +36,16 @@ func NewAuthenticationController(ser service.AuthenticationService, log log.Logg
 }
 
 // RegisterRoutes will register routes for authentication controller.
-func (c *authenticationController) RegisterRoutes(router *gin.Engine) {
-	router.POST("/register", c.register)
-	router.POST("/login", c.login)
+func (c *authenticationController) RegisterRoutes(router *gin.RouterGroup) {
 
-	c.log.Info("User auth routes registered.")
+	unguarded := router.Group("")
+	unguarded.POST("/register", c.register)
+	unguarded.POST("/login", c.login)
+
+	guarded := router.Group("/users", c.auth.Middleware())
+	guarded.PUT("/:userID", c.updateUser)
+
+	c.log.Info(" === User auth routes registered === ")
 }
 
 // register will register new user in the system.
@@ -95,4 +104,47 @@ func (c *authenticationController) login(ctx *gin.Context) {
 	}
 
 	web.RespondJSON(ctx, http.StatusOK, auth)
+}
+
+// updateUser will update user details.
+func (c *authenticationController) updateUser(ctx *gin.Context) {
+	user := userModal.User{}
+	parser := web.NewParser(ctx)
+
+	err := web.UnmarshalJSON(ctx.Request, &user)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user.ID, err = parser.GetUUID("userID")
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user.UpdatedBy, err = c.auth.ExtractUserID(ctx)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = user.Validate()
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = c.service.UpdateUser(&user)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	web.RespondJSON(ctx, http.StatusAccepted, nil)
 }

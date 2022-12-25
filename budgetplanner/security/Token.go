@@ -8,7 +8,7 @@ import (
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/config"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/log"
-	userModal "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
+	userModel "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 )
 
 // GenerateToken take userID, email, tablename as Role  Return Token
@@ -27,7 +27,7 @@ func (auth *Authentication) generateToken(claims jwt.Claims) (string, error) {
 }
 
 // GenerateLoginToken will create new login token
-func (auth *Authentication) GenerateLoginToken(a *userModal.Authentication) error {
+func (auth *Authentication) GenerateLoginToken(a *userModel.Authentication) error {
 
 	// Create a claims map
 	// claims based on which token should be created
@@ -38,19 +38,18 @@ func (auth *Authentication) GenerateLoginToken(a *userModal.Authentication) erro
 	// 	"exp":     time.Now().Add(time.Hour * 20).Unix(),
 	// }
 
-	registeredClaims := jwt.RegisteredClaims{
-		Issuer:  "budget-planner",
-		Subject: "login",
-		Audience: jwt.ClaimStrings{
-			a.Name, a.Email,
+	claims := userModel.Claims{
+		UserID: a.UserID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "budget-planner",
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ID:        a.UserID.String(),
 		},
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 20)),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ID:        a.UserID.String(),
 	}
 
 	var err error
-	a.Token, err = auth.generateToken(registeredClaims)
+	a.Token, err = auth.generateToken(claims)
 
 	return err
 }

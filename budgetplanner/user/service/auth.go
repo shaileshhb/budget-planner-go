@@ -1,8 +1,7 @@
 package service
 
 import (
-	"fmt"
-
+	"github.com/google/uuid"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	userModal "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/repository"
@@ -10,9 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
+// AuthenticationService consist of all methods AuthenticationService should implement.
 type AuthenticationService interface {
 	Register(user *userModal.User) error
 	Login(login *userModal.Login, auth *userModal.Authentication) error
+	UpdateUser(user *userModal.User) error
 }
 
 // AuthenticationService service provides methods to update, delete, add, get method for AuthenticationService.
@@ -84,16 +85,64 @@ func (ser *authenticationService) Login(login *userModal.Login, auth *userModal.
 		return err
 	}
 
-	fmt.Println(" ================== token ->", auth.Token)
+	uow.Commit()
+	return nil
+}
+
+// UpdateUser will update user details.
+func (ser *authenticationService) UpdateUser(user *userModal.User) error {
+
+	err := ser.validateUserID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	err = ser.validateUser(user)
+	if err != nil {
+		return err
+	}
+
+	uow := repository.NewUnitOfWork(ser.db)
+	defer uow.RollBack()
+
+	tempUser := userModal.User{}
+
+	err = ser.repo.GetRecord(uow, &tempUser, repository.Filter("users.`id` = ?", user.ID),
+		repository.Select("`created_by`"))
+	if err != nil {
+		return err
+	}
+
+	user.CreatedBy = tempUser.CreatedBy
+
+	err = ser.repo.Save(uow, &user)
+	if err != nil {
+		return err
+	}
 
 	uow.Commit()
 	return nil
 }
 
+// validateUserID will verify if userID exist or not.
+func (ser *authenticationService) validateUserID(userID uuid.UUID) error {
+
+	exist, err := repository.DoesRecordExist(ser.db, userModal.User{},
+		repository.Filter("users.`id` = ?", userID))
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errors.NewValidationError("User not found")
+	}
+	return nil
+}
+
 // validateUer will check if it is unique user.
 func (ser *authenticationService) validateUser(user *userModal.User) error {
-	exist, err := repository.DoesRecordExist(ser.db, userModal.User{}, repository.Filter("users.`id` != ?"+
-		" AND users.`email` = ? AND users.`username` = ?", user.ID, user.Email, user.Username))
+	exist, err := repository.DoesRecordExist(ser.db, userModal.User{},
+		repository.Filter("users.`id` != ? AND users.`email` = ?"+
+			" AND users.`username` = ?", user.ID, user.Email, user.Username))
 	if err != nil {
 		return err
 	}
