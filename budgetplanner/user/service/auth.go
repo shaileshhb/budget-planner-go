@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	userModal "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/repository"
@@ -10,6 +12,7 @@ import (
 
 type AuthenticationService interface {
 	Register(user *userModal.User) error
+	Login(login *userModal.Login, auth *userModal.Authentication) error
 }
 
 // AuthenticationService service provides methods to update, delete, add, get method for AuthenticationService.
@@ -55,7 +58,39 @@ func (ser *authenticationService) Register(user *userModal.User) error {
 	return nil
 }
 
-// validateUser will check if it is unique user.
+// Login will verify user details and login into the system
+func (ser *authenticationService) Login(login *userModal.Login, auth *userModal.Authentication) error {
+
+	uow := repository.NewUnitOfWork(ser.db)
+	defer uow.RollBack()
+
+	user := userModal.User{}
+	err := ser.repo.GetRecord(uow, &user, repository.Filter("users.`username` = ?", login.Username))
+	if err != nil {
+		return err
+	}
+
+	err = security.ComparePassword(user.Password, login.Password)
+	if err != nil {
+		return errors.NewValidationError("Invalid username or password.")
+	}
+
+	auth.UserID = user.ID
+	auth.Name = user.Name
+	auth.Email = user.Email
+
+	err = ser.auth.GenerateLoginToken(auth)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(" ================== token ->", auth.Token)
+
+	uow.Commit()
+	return nil
+}
+
+// validateUer will check if it is unique user.
 func (ser *authenticationService) validateUser(user *userModal.User) error {
 	exist, err := repository.DoesRecordExist(ser.db, userModal.User{}, repository.Filter("users.`id` != ?"+
 		" AND users.`email` = ? AND users.`username` = ?", user.ID, user.Email, user.Username))

@@ -15,7 +15,7 @@ type Base struct {
 	UpdatedBy  uuid.UUID  `gorm:"type:varchar(36)" json:"-"`
 	UpdatedAt  time.Time  `json:"-"`
 	DeletedBy  uuid.UUID  `gorm:"type:varchar(36)" json:"-"`
-	DeletedAt  *time.Time `sql:"index" json:"-"`
+	DeletedAt  *time.Time `gorm:"index:idx_deleted_at" json:"-"`
 	IgnoreHook bool       `gorm:"-" json:"-"`
 }
 

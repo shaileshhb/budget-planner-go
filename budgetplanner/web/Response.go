@@ -45,17 +45,18 @@ func RespondJSONWithXTotalCount(ctx *gin.Context, code int, count int, payload i
 
 // RespondErrorMessage make error response with payload.
 func RespondErrorMessage(ctx *gin.Context, code int, msg string) {
-	RespondJSON(ctx, code, map[string]string{"error": msg})
+	// RespondJSON(ctx, code, map[string]string{"error": msg})
+	ctx.AbortWithStatusJSON(code, msg)
 }
 
 // RespondError check error type and Write to ResponseWriter.
 func RespondError(ctx *gin.Context, err error) {
 	switch err.(type) {
 	case *errors.ValidationError:
-		RespondJSON(ctx, http.StatusBadRequest, err)
+		RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
 	case *errors.HTTPError:
 		httpError := err.(*errors.HTTPError)
-		RespondJSON(ctx, httpError.HTTPStatus, httpError.ErrorKey)
+		RespondErrorMessage(ctx, httpError.HTTPStatus, httpError.ErrorKey)
 	default:
 		RespondErrorMessage(ctx, http.StatusInternalServerError, err.Error())
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/config"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/errors"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/log"
+	userModal "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 )
 
 // GenerateToken take userID, email, tablename as Role  Return Token
@@ -26,7 +27,7 @@ func (auth *Authentication) generateToken(claims jwt.Claims) (string, error) {
 }
 
 // GenerateLoginToken will create new login token
-func (auth *Authentication) GenerateLoginToken(userID, name, email string) (string, error) {
+func (auth *Authentication) GenerateLoginToken(a *userModal.Authentication) error {
 
 	// Create a claims map
 	// claims based on which token should be created
@@ -41,12 +42,15 @@ func (auth *Authentication) GenerateLoginToken(userID, name, email string) (stri
 		Issuer:  "budget-planner",
 		Subject: "login",
 		Audience: jwt.ClaimStrings{
-			name, email,
+			a.Name, a.Email,
 		},
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 20)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		ID:        userID,
+		ID:        a.UserID.String(),
 	}
 
-	return auth.generateToken(registeredClaims)
+	var err error
+	a.Token, err = auth.generateToken(registeredClaims)
+
+	return err
 }

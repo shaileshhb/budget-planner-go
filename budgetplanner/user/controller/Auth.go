@@ -14,6 +14,7 @@ import (
 type AuthenticationController interface {
 	RegisterRoutes(router *gin.Engine)
 	register(ctx *gin.Context)
+	login(ctx *gin.Context)
 }
 
 type authenticationController struct {
@@ -32,15 +33,15 @@ func NewAuthenticationController(ser service.AuthenticationService, log log.Logg
 
 // RegisterRoutes will register routes for authentication controller.
 func (c *authenticationController) RegisterRoutes(router *gin.Engine) {
-	router.GET("/register", c.register)
+	router.POST("/register", c.register)
+	router.POST("/login", c.login)
 
 	c.log.Info("User auth routes registered.")
 }
 
+// register will register new user in the system.
 func (c *authenticationController) register(ctx *gin.Context) {
-	c.log.Info("================ register called ================")
 	// parser := web.NewParser(ctx)
-
 	user := userModal.User{}
 
 	err := web.UnmarshalJSON(ctx.Request, &user)
@@ -64,5 +65,34 @@ func (c *authenticationController) register(ctx *gin.Context) {
 		return
 	}
 
-	web.RespondJSON(ctx, http.StatusOK, user)
+	web.RespondJSON(ctx, http.StatusAccepted, nil)
+}
+
+// login will verify user details and login into the system
+func (c *authenticationController) login(ctx *gin.Context) {
+	login := userModal.Login{}
+	auth := userModal.Authentication{}
+
+	err := web.UnmarshalJSON(ctx.Request, &login)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = login.Validate()
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = c.service.Login(&login, &auth)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	web.RespondJSON(ctx, http.StatusOK, auth)
 }

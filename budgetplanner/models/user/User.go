@@ -11,9 +11,9 @@ import (
 type User struct {
 	general.Base
 	Name         string  `json:"name" gorm:"type:varchar(100)"`
-	Username     string  `json:"username" gorm:"type:varchar(200)" sql:"index"`
-	Email        string  `json:"email" gorm:"type:varchar(255)" sql:"index"`
-	Password     string  `json:"password" gorm:"type:varchar(255)" sql:"index"`
+	Username     string  `json:"username" gorm:"type:varchar(200);index:idx_username"`
+	Email        string  `json:"email" gorm:"type:varchar(255);index:idx_email"`
+	Password     string  `json:"password" gorm:"type:varchar(255);index:idx_password"`
 	DateOfBirth  *string `json:"dateOfBirth" gorm:"type:varchar(10)"`
 	Gender       *string `json:"gender" gorm:"type:varchar(20)"`
 	Contact      *string `json:"contact" gorm:"type:varchar(15)"`
@@ -72,6 +72,27 @@ func (u *User) Validate() error {
 	if u.Contact != nil {
 		*u.Contact = strings.TrimSpace(*u.Contact)
 	}
+
+	return nil
+}
+
+// Login contains details required for login.
+type Login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (l *Login) Validate() error {
+	if len(strings.TrimSpace(l.Username)) == 0 {
+		return errors.NewValidationError("username must be specified")
+	}
+
+	if len(strings.TrimSpace(l.Password)) == 0 {
+		return errors.NewValidationError("password must be specified")
+	}
+
+	l.Username = strings.TrimSpace(l.Username)
+	l.Password = strings.TrimSpace(l.Password)
 
 	return nil
 }
