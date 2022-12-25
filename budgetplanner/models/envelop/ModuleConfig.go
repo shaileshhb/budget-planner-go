@@ -23,6 +23,7 @@ func NewEnvelopModuleConfig(db *gorm.DB) *ModuleConfig {
 func (config *ModuleConfig) TableMigration(wg *sync.WaitGroup) {
 	var models []interface{} = []interface{}{
 		&Envelop{},
+		&Transaction{},
 	}
 
 	for _, model := range models {
