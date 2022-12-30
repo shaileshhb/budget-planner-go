@@ -14,5 +14,8 @@ func registerEnvelopRoutes(app *budgetplanner.App, repo repository.Repository) {
 	envelopService := envelopservice.NewEnvelopService(app.DB, repo, app.Auth)
 	enevlopController := envelopcontroller.NewEnvelopController(envelopService, app.Log, app.Auth)
 
-	app.RegisterControllerRoutes([]budgetplanner.Controller{enevlopController})
+	transactionService := envelopservice.NewTransactionService(app.DB, repo, app.Auth)
+	transactionController := envelopcontroller.NewTransactionController(transactionService, app.Log, app.Auth)
+
+	app.RegisterControllerRoutes([]budgetplanner.Controller{enevlopController, transactionController})
 }

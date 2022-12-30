@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// envelopService service provides methods to update, delete, add, get method for envelopService.
+// EnvelopService service provides methods to update, delete, add, get method for envelopService.
 type EnvelopService interface {
 	AddEnvelop(envelop *envelopModel.Envelop) error
 	UpdateEnvelop(envelop *envelopModel.Envelop) error
