@@ -52,6 +52,7 @@ func (c *authenticationController) RegisterRoutes(router *gin.RouterGroup) {
 func (c *authenticationController) register(ctx *gin.Context) {
 	// parser := web.NewParser(ctx)
 	user := userModal.User{}
+	auth := userModal.Authentication{}
 
 	err := web.UnmarshalJSON(ctx.Request, &user)
 	if err != nil {
@@ -67,14 +68,14 @@ func (c *authenticationController) register(ctx *gin.Context) {
 		return
 	}
 
-	err = c.service.Register(&user)
+	err = c.service.Register(&user, &auth)
 	if err != nil {
 		c.log.Error(err)
 		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	web.RespondJSON(ctx, http.StatusAccepted, nil)
+	web.RespondJSON(ctx, http.StatusOK, auth)
 }
 
 // login will verify user details and login into the system

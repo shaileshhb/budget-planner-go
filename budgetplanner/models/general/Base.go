@@ -33,6 +33,6 @@ func (b *Base) BeforeCreate(scope *gorm.DB) error {
 // Should only be used for reading operations.
 type BaseDTO struct {
 	ID        uuid.UUID  `json:"id"`
-	CreatedAt time.Time  `json:"createdAt"`
+	CreatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 }

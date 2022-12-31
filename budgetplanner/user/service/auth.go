@@ -11,7 +11,7 @@ import (
 
 // AuthenticationService consist of all methods AuthenticationService should implement.
 type AuthenticationService interface {
-	Register(user *userModal.User) error
+	Register(user *userModal.User, auth *userModal.Authentication) error
 	Login(login *userModal.Login, auth *userModal.Authentication) error
 	UpdateUser(user *userModal.User) error
 }
@@ -33,7 +33,7 @@ func NewAuthenticationService(db *gorm.DB, repo repository.Repository, auth *sec
 }
 
 // Register will register new user in the system.
-func (ser *authenticationService) Register(user *userModal.User) error {
+func (ser *authenticationService) Register(user *userModal.User, auth *userModal.Authentication) error {
 
 	err := ser.validateUser(user)
 	if err != nil {
@@ -51,6 +51,15 @@ func (ser *authenticationService) Register(user *userModal.User) error {
 	defer uow.RollBack()
 
 	err = ser.repo.Add(uow, user)
+	if err != nil {
+		return err
+	}
+
+	auth.UserID = user.ID
+	auth.Name = user.Name
+	auth.Email = user.Email
+
+	err = ser.auth.GenerateLoginToken(auth)
 	if err != nil {
 		return err
 	}
