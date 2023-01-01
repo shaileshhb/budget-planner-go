@@ -17,6 +17,7 @@ type TransactionController interface {
 	addTransaction(ctx *gin.Context)
 	updateTransaction(ctx *gin.Context)
 	deleteTransaction(ctx *gin.Context)
+	getUserTransaction(ctx *gin.Context)
 }
 
 // transactionController.
@@ -44,7 +45,7 @@ func (c *transactionController) RegisterRoutes(router *gin.RouterGroup) {
 	guarded.POST("/:userID/transactions", c.addTransaction)
 	guarded.PUT("/:userID/transactions/:transactionID", c.updateTransaction)
 	guarded.DELETE("/:userID/transactions/:transactionID", c.deleteTransaction)
-	// guarded.GET("/:userID/envelops", c.getEnvelops)
+	guarded.GET("/:userID/transactions", c.getUserTransaction)
 }
 
 // addTransaction will add new transaction for user.
@@ -163,4 +164,29 @@ func (c *transactionController) deleteTransaction(ctx *gin.Context) {
 	}
 
 	web.RespondJSON(ctx, http.StatusAccepted, nil)
+}
+
+// getUserTransaction will fetch transactions of user.
+func (c *transactionController) getUserTransaction(ctx *gin.Context) {
+
+	transactions := []envelopModel.TransactionDTO{}
+	parser := web.NewParser(ctx)
+
+	userID, err := parser.GetUUID("userID")
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var totalCount int64
+
+	err = c.service.GetUserTransaction(&transactions, userID, &totalCount, parser)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	web.RespondJSONWithXTotalCount(ctx, http.StatusOK, int(totalCount), transactions)
 }

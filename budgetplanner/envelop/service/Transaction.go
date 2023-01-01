@@ -1,6 +1,7 @@
 package service
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,6 +10,8 @@ import (
 	userModel "github.com/shaileshhb/budget-planner-go/budgetplanner/models/user"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/repository"
 	"github.com/shaileshhb/budget-planner-go/budgetplanner/security"
+	"github.com/shaileshhb/budget-planner-go/budgetplanner/util"
+	"github.com/shaileshhb/budget-planner-go/budgetplanner/web"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +20,8 @@ type TransactionService interface {
 	AddTransaction(transaction *envelopModel.Transaction) error
 	UpdateTransaction(transaction *envelopModel.Transaction) error
 	DeleteTransaction(transaction *envelopModel.Transaction) error
+	GetUserTransaction(transactions *[]envelopModel.TransactionDTO,
+		userID uuid.UUID, totalCount *int64, parser *web.Parser) error
 }
 
 // transactionService
@@ -128,6 +133,31 @@ func (ser *transactionService) DeleteTransaction(transaction *envelopModel.Trans
 	return nil
 }
 
+// GetUserTransaction will fetch transactions of user.
+func (ser *transactionService) GetUserTransaction(transactions *[]envelopModel.TransactionDTO,
+	userID uuid.UUID, totalCount *int64, parser *web.Parser) error {
+
+	err := ser.validateUserID(userID)
+	if err != nil {
+		return err
+	}
+
+	limit, offset := parser.ParseLimitAndOffset()
+
+	uow := repository.NewUnitOfWork(ser.db)
+	defer uow.RollBack()
+
+	err = ser.repo.GetAllInOrder(uow, transactions, "transactions.`date` DESC",
+		ser.addSearchQueries(parser.Form), repository.PreloadAssociations([]string{"Envelop"}),
+		repository.Filter("transactions.`user_id` = ?", userID), repository.Paginate(limit, offset, totalCount))
+	if err != nil {
+		return err
+	}
+
+	uow.Commit()
+	return nil
+}
+
 // validateUserID will verify if userID exist or not.
 func (ser *transactionService) validateUserID(userID uuid.UUID) error {
 
@@ -169,4 +199,23 @@ func (ser *transactionService) validateTransactionID(transactionID uuid.UUID) er
 		return errors.NewValidationError("Transaction not found")
 	}
 	return nil
+}
+
+func (ser *transactionService) addSearchQueries(requestForm url.Values) repository.QueryProcessor {
+	var columnNames []string
+	var conditions []string
+	var operators []string
+	var values []interface{}
+	var queryProcessors []repository.QueryProcessor
+
+	if fromDate, ok := requestForm["fromDate"]; ok {
+		util.AddToSlice("transactions.`date`", ">= ?", "AND", fromDate, &columnNames, &conditions, &operators, &values)
+	}
+
+	if toDate, ok := requestForm["toDate"]; ok {
+		util.AddToSlice("transactions.`date`", "<= ?", "AND", toDate, &columnNames, &conditions, &operators, &values)
+	}
+
+	queryProcessors = append(queryProcessors, repository.FilterWithOperator(columnNames, conditions, operators, values))
+	return repository.CombineQueries(queryProcessors)
 }

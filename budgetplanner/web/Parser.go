@@ -56,7 +56,7 @@ func (p *Parser) ParseLimitAndOffset() (limit, offset int) {
 	limitparam := p.Form.Get("limit")
 	offsetparam := p.Form.Get("offset")
 	var err error
-	limit = 5
+	limit = 30
 	if len(limitparam) > 0 {
 		limit, err = strconv.Atoi(limitparam)
 		if err != nil {

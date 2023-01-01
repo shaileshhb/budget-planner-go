@@ -14,6 +14,7 @@ type AuthenticationService interface {
 	Register(user *userModal.User, auth *userModal.Authentication) error
 	Login(login *userModal.Login, auth *userModal.Authentication) error
 	UpdateUser(user *userModal.User) error
+	GetUser(user *userModal.UserDTO) error
 }
 
 // AuthenticationService service provides methods to update, delete, add, get method for AuthenticationService.
@@ -98,6 +99,26 @@ func (ser *authenticationService) Login(login *userModal.Login, auth *userModal.
 	return nil
 }
 
+// GetUser will fetch specified user details.
+func (ser *authenticationService) GetUser(user *userModal.UserDTO) error {
+
+	err := ser.validateUserID(user.ID)
+	if err != nil {
+		return err
+	}
+
+	uow := repository.NewUnitOfWork(ser.db)
+	defer uow.RollBack()
+
+	err = ser.repo.GetRecord(uow, user, repository.Filter("users.`id` = ?", user.ID))
+	if err != nil {
+		return err
+	}
+
+	uow.Commit()
+	return nil
+}
+
 // UpdateUser will update user details.
 func (ser *authenticationService) UpdateUser(user *userModal.User) error {
 
@@ -117,12 +138,13 @@ func (ser *authenticationService) UpdateUser(user *userModal.User) error {
 	tempUser := userModal.User{}
 
 	err = ser.repo.GetRecord(uow, &tempUser, repository.Filter("users.`id` = ?", user.ID),
-		repository.Select("`created_by`"))
+		repository.Select("`created_by`, `password`"))
 	if err != nil {
 		return err
 	}
 
 	user.CreatedBy = tempUser.CreatedBy
+	user.Password = tempUser.Password
 
 	err = ser.repo.Save(uow, &user)
 	if err != nil {

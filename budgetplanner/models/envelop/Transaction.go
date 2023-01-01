@@ -69,6 +69,8 @@ type TransactionDTO struct {
 	Date            time.Time `json:"date"`
 	TransactionType string    `json:"transactionType"`
 	Description     *string   `json:"description"`
+	Envelop         Envelop   `json:"envelop" gorm:"foreignKey:EnvelopID"`
+	EnvelopID       uuid.UUID `json:"envelopID"`
 }
 
 // TableName will specify table name for transaction struct.

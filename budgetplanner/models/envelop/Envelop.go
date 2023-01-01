@@ -47,9 +47,10 @@ func (e *Envelop) Validate() error {
 // EnvelopDTO contains fields for DTO specifically.
 type EnvelopDTO struct {
 	general.BaseDTO
-	Name   string    `json:"name"`
-	UserID uuid.UUID `json:"userID"`
-	Amount float64   `json:"amount"`
+	Name        string    `json:"name"`
+	UserID      uuid.UUID `json:"userID"`
+	Amount      float64   `json:"amount"`
+	AmountSpent float64   `json:"amountSpent,omitempty"`
 }
 
 // TableName will specify table name for envelop struct.

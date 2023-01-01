@@ -29,15 +29,15 @@ func (*User) TableName() string {
 // UserDTO contains fields for DTO specifically.
 type UserDTO struct {
 	general.BaseDTO
-	Name         string `json:"name"`
-	Username     string `json:"username"`
-	Email        string `json:"email"`
-	Password     string `json:"-"`
-	DateOfBirth  string `json:"dateOfBirth"`
-	Gender       string `json:"gender"`
-	Contact      string `json:"contact"`
-	ProfileImage string `json:"profileImage"`
-	IsVerified   bool   `json:"isVerified"`
+	Name         string  `json:"name"`
+	Username     string  `json:"username"`
+	Email        string  `json:"email"`
+	Password     string  `json:"-"`
+	DateOfBirth  *string `json:"dateOfBirth"`
+	Gender       *string `json:"gender"`
+	Contact      *string `json:"contact"`
+	ProfileImage *string `json:"profileImage"`
+	IsVerified   bool    `json:"isVerified"`
 }
 
 // TableName will specify table name for user struct.
@@ -45,8 +45,8 @@ func (*UserDTO) TableName() string {
 	return "users"
 }
 
-// Validate will verify compulsory fields of user.
-func (u *User) Validate() error {
+// ValidateRegistration will verify compulsory fields of user.
+func (u *User) ValidateRegistration() error {
 	if len(strings.TrimSpace(u.Name)) == 0 {
 		return errors.NewValidationError("name must be specified")
 	}
@@ -70,6 +70,33 @@ func (u *User) Validate() error {
 	}
 
 	u.Password = strings.TrimSpace(u.Password)
+	if u.Contact != nil {
+		*u.Contact = strings.TrimSpace(*u.Contact)
+	}
+
+	return nil
+}
+
+// ValidateUser will verify compulsory fields of user.
+func (u *User) ValidateUser() error {
+	if len(strings.TrimSpace(u.Name)) == 0 {
+		return errors.NewValidationError("name must be specified")
+	}
+
+	u.Name = strings.TrimSpace(u.Name)
+
+	if len(strings.TrimSpace(u.Username)) == 0 {
+		return errors.NewValidationError("username must be specified")
+	}
+
+	u.Username = strings.TrimSpace(u.Username)
+
+	if len(strings.TrimSpace(u.Email)) == 0 {
+		return errors.NewValidationError("email must be specified")
+	}
+
+	u.Email = strings.TrimSpace(u.Email)
+
 	if u.Contact != nil {
 		*u.Contact = strings.TrimSpace(*u.Contact)
 	}

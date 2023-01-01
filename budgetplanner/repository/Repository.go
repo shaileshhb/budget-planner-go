@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -211,6 +213,113 @@ func Model(value interface{}) QueryProcessor {
 func Filter(condition string, args ...interface{}) QueryProcessor {
 	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
 		db = db.Debug().Where(condition, args...)
+		return db, nil
+	}
+}
+
+// PreloadAssociations preloads data from the specified table.
+//
+//	PreloadAssociations([]string{"Orders", "Customers"})   #niranjan use ...string
+func PreloadAssociations(preloadAssociations []string) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		for _, association := range preloadAssociations {
+			db = db.Debug().Preload(association)
+		}
+		return db, nil
+	}
+}
+
+// PreloadWithCustomCondition preloads associations with queryProcessor.
+//
+//	'Cant use maps as they dont maintain the order of queries'
+func PreloadWithCustomCondition(preloadAssociations ...Preload) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		// closureIndex is a separate index maintained for looping inside the anonymous func.
+		var closureIndex uint8
+		for _, association := range preloadAssociations {
+			db = db.Preload(association.Schema, func(db *gorm.DB) *gorm.DB {
+				db, err := executeQueryProcessors(db, out, preloadAssociations[closureIndex].Queryprocessors...)
+				if err != nil {
+					db.Error = err
+				}
+				closureIndex++
+				return db
+			})
+			if db.Error != nil {
+				return db, db.Error
+			}
+		}
+		return db, nil
+	}
+}
+
+// Paginate will restrict the output of query with limit and offset & fill totalCount with total records.
+func Paginate(limit, offset int, totalCount *int64) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+		if out != nil {
+			if totalCount != nil {
+				if err := db.Model(out).Count(totalCount).Error; err != nil {
+					return db, err
+				}
+			}
+		}
+
+		if limit != -1 {
+			db = db.Limit(limit)
+		}
+
+		if offset > 0 {
+			db = db.Offset(limit * offset)
+		}
+		return db, nil
+	}
+}
+
+// FilterWithOperator adds multiple condition with operator.
+// FilterWithOperator("`sales_person_id`", "IS NULL", "AND", nil) ===> Pass nil in value for NULL checks
+//
+//	FilterWithOperator([]string{"name","age"},[]string{"LIKE ?",">"},[]string{"AND"},[]interface{"ajay",18}])
+//
+// Query: `name` LIKE "ajay" AND `age` > 18
+func FilterWithOperator(columnNames []string, conditions []string, operators []string, values []interface{}) QueryProcessor {
+	return func(db *gorm.DB, out interface{}) (*gorm.DB, error) {
+
+		if len(columnNames) != len(conditions) && len(conditions) != len(values) {
+			return db, nil
+		}
+
+		if len(conditions) == 1 {
+			if values[0] == nil {
+				db = db.Where(fmt.Sprintf("%v %v", columnNames[0], conditions[0]))
+				return db, nil
+			}
+			db = db.Where(fmt.Sprintf("%v %v", columnNames[0], conditions[0]), values[0])
+			return db, nil
+		}
+		if len(columnNames)-1 != len(operators) {
+			return db, nil
+		}
+
+		str := ""
+		nums := []int{}
+		for index := 0; index < len(columnNames); index++ {
+			if values[index] == nil {
+				nums = append(nums, index)
+			}
+			if index == len(columnNames)-1 {
+				str = fmt.Sprintf("%v%v %v", str, columnNames[index], conditions[index])
+			} else {
+				str = fmt.Sprintf("%v%v %v %v ", str, columnNames[index], conditions[index], operators[index])
+			}
+		}
+		for ind, num := range nums {
+			values = append(values[:num], values[num+1:]...)
+			for i := ind; i < len(nums); i++ {
+				// This is done to adjust indexes because we sliced.
+				nums[i] = nums[i] - 1
+			}
+		}
+		db = db.Where(str, values...)
 		return db, nil
 	}
 }

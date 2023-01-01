@@ -16,6 +16,7 @@ type AuthenticationController interface {
 	RegisterRoutes(router *gin.RouterGroup)
 	register(ctx *gin.Context)
 	login(ctx *gin.Context)
+	getUser(ctx *gin.Context)
 }
 
 // authenticationController.
@@ -38,14 +39,13 @@ func NewAuthenticationController(ser service.AuthenticationService, log log.Logg
 // RegisterRoutes will register routes for authentication controller.
 func (c *authenticationController) RegisterRoutes(router *gin.RouterGroup) {
 
-	unguarded := router.Group("")
-	unguarded.POST("/register", c.register)
-	unguarded.POST("/login", c.login)
+	// unguarded := router.Group("")
+	router.POST("/register", c.register)
+	router.POST("/login", c.login)
 
 	guarded := router.Group("/users", c.auth.Middleware())
 	guarded.PUT("/:userID", c.updateUser)
-
-	c.log.Info(" === User auth routes registered === ")
+	guarded.GET("/:userID", c.getUser)
 }
 
 // register will register new user in the system.
@@ -61,7 +61,7 @@ func (c *authenticationController) register(ctx *gin.Context) {
 		return
 	}
 
-	err = user.Validate()
+	err = user.ValidateRegistration()
 	if err != nil {
 		c.log.Error(err)
 		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
@@ -133,7 +133,7 @@ func (c *authenticationController) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	err = user.Validate()
+	err = user.ValidateUser()
 	if err != nil {
 		c.log.Error(err)
 		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
@@ -148,4 +148,27 @@ func (c *authenticationController) updateUser(ctx *gin.Context) {
 	}
 
 	web.RespondJSON(ctx, http.StatusAccepted, nil)
+}
+
+// getUser will fetch specified user details.
+func (c *authenticationController) getUser(ctx *gin.Context) {
+	user := userModal.UserDTO{}
+	parser := web.NewParser(ctx)
+	var err error
+
+	user.ID, err = parser.GetUUID("userID")
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = c.service.GetUser(&user)
+	if err != nil {
+		c.log.Error(err)
+		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	web.RespondJSON(ctx, http.StatusOK, user)
 }

@@ -131,7 +131,8 @@ func (ser *envelopService) GetEnvelops(envelops *[]envelopModel.EnvelopDTO, user
 	uow := repository.NewUnitOfWork(ser.db)
 	defer uow.RollBack()
 
-	err = ser.repo.GetAllInOrder(uow, envelops, "envelops.`name`", repository.Filter("envelops.`user_id` = ?", userID))
+	err = ser.repo.GetAllInOrder(uow, envelops, "envelops.`name`",
+		repository.Filter("envelops.`user_id` = ?", userID))
 	if err != nil {
 		return err
 	}
