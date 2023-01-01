@@ -19,7 +19,7 @@ type Transaction struct {
 	EnvelopID       uuid.UUID      `json:"envelopID" gorm:"type:char(36);index:idx_envelop_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Payee           string         `json:"payee" gorm:"type:varchar(100);not_null"`
 	Amount          float64        `json:"amount" gorm:"type:decimal(10,2);not_null"`
-	Date            time.Time      `json:"date" gorm:"type:datetime;not_null"`
+	Date            string         `json:"date" gorm:"type:datetime;not_null"`
 	TransactionType string         `json:"transactionType" gorm:"type:varchar(255)"`
 	Description     *string        `json:"description" gorm:"type:varchar(1000)"`
 }
@@ -54,7 +54,7 @@ func (t *Transaction) Validate() error {
 		return errors.NewValidationError("transaction type must be specified")
 	}
 
-	if t.Date.IsZero() {
+	if len(t.Date) == 0 {
 		return errors.NewValidationError("date must be specified")
 	}
 
@@ -64,13 +64,13 @@ func (t *Transaction) Validate() error {
 // TransactionDTO contains fields for DTO specifically.
 type TransactionDTO struct {
 	general.BaseDTO
-	Payee           string    `json:"payee"`
-	Amount          float64   `json:"amount"`
-	Date            time.Time `json:"date"`
-	TransactionType string    `json:"transactionType"`
-	Description     *string   `json:"description"`
-	Envelop         Envelop   `json:"envelop" gorm:"foreignKey:EnvelopID"`
-	EnvelopID       uuid.UUID `json:"envelopID"`
+	Payee           string     `json:"payee"`
+	Amount          float64    `json:"amount"`
+	Date            time.Time  `json:"date"`
+	TransactionType string     `json:"transactionType"`
+	Description     *string    `json:"description"`
+	Envelop         EnvelopDTO `json:"envelop" gorm:"foreignKey:EnvelopID"`
+	EnvelopID       uuid.UUID  `json:"envelopID"`
 }
 
 // TableName will specify table name for transaction struct.

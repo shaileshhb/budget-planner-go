@@ -16,13 +16,19 @@ import (
 	"github.com/shaileshhb/budget-planner-go/module"
 )
 
+var production = "false"
+
 func main() {
+	isAppInProduction := false
+	if production == "true" {
+		isAppInProduction = true
+	}
 
 	// creates new instance of Logger
 	log := log.GetLogger()
 
 	// creates new instance of Config
-	envconfig := config.NewConfig(false)
+	envconfig := config.NewConfig(isAppInProduction)
 
 	// Create New Instace of DB
 	db := db.NewDBConnection(log, envconfig)
@@ -45,7 +51,7 @@ func main() {
 	var repository = repository.NewGormRepository()
 
 	app := budgetplanner.NewApp("Money wisely", db, log, envconfig,
-		&wg, midlware, false, repository)
+		&wg, midlware, isAppInProduction, repository)
 
 	module.CreateRouterInstance(app, repository)
 	module.Configure(app)
