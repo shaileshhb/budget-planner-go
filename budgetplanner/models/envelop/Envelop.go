@@ -50,7 +50,7 @@ type EnvelopDTO struct {
 	Name        string    `json:"name"`
 	UserID      uuid.UUID `json:"userID"`
 	Amount      float64   `json:"amount"`
-	AmountSpent float64   `json:"amountSpent,omitempty"`
+	AmountSpent float64   `json:"amountSpent"`
 }
 
 // TableName will specify table name for envelop struct.

@@ -137,6 +137,16 @@ func (ser *envelopService) GetEnvelops(envelops *[]envelopModel.EnvelopDTO, user
 		return err
 	}
 
+	for index := range *envelops {
+		err = ser.repo.Scan(uow, &(*envelops)[index], repository.Model(envelopModel.Transaction{}),
+			repository.Select("SUM(transactions.`amount`) AS amount_spent"),
+			repository.Filter("transactions.`envelop_id` = ? AND transactions.`user_id` = ?",
+				(*envelops)[index].ID, userID))
+		if err != nil {
+			return err
+		}
+	}
+
 	uow.Commit()
 	return nil
 }
