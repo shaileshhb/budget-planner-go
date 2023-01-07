@@ -27,6 +27,12 @@ func main() {
 	// creates new instance of Logger
 	log := log.GetLogger()
 
+	file, err := os.OpenFile("logs/out.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err == nil {
+		log.SetOutput(file)
+	}
+	defer file.Close()
+
 	// creates new instance of Config
 	envconfig := config.NewConfig(isAppInProduction)
 
@@ -56,7 +62,7 @@ func main() {
 	module.CreateRouterInstance(app, repository)
 	module.Configure(app)
 
-	err := app.Start()
+	err = app.Start()
 	if err != nil {
 		log.Fatal(err)
 		stopApp(app)

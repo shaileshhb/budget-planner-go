@@ -31,10 +31,25 @@ var logger = logrus.New()
 // init will create instance of logger
 func init() {
 	logger.SetReportCaller(true)
-	logger.SetFormatter(&logrus.TextFormatter{
+	// logger.SetFormatter(&logrus.TextFormatter{
+	// 	TimestampFormat: time.RFC3339,
+	// 	FullTimestamp:   true,
+	// 	DisableColors:   false,
+	// CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+	// 	d := formatPackageAndFunctionName(f.Function)
+	// 	return "", colorSet(color.FgLightYellow).Sprintf("[%s:%d]",
+	// 		formatFilePath(f.File), f.Line) + colorSet(color.FgLightMagenta).Sprintf("[%s]",
+	// 		d[0]) + colorSet(color.Cyan).Sprintf("[%s]", d[1])
+	// },
+	// })
+
+	logger.SetFormatter(&logrus.JSONFormatter{
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyTime: "@timestamp",
+			logrus.FieldKeyMsg:  "message",
+		},
 		TimestampFormat: time.RFC3339,
-		FullTimestamp:   true,
-		DisableColors:   false,
+		PrettyPrint:     true,
 		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
 			d := formatPackageAndFunctionName(f.Function)
 			return "", colorSet(color.FgLightYellow).Sprintf("[%s:%d]",
@@ -42,7 +57,9 @@ func init() {
 				d[0]) + colorSet(color.Cyan).Sprintf("[%s]", d[1])
 		},
 	})
-	logger.Level = logrus.InfoLevel
+
+	// logger.Level = logrus.InfoLevel
+	logrus.SetLevel(logrus.TraceLevel)
 }
 
 // GetLogger shares the single instance of logger.

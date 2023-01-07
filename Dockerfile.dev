@@ -29,4 +29,5 @@ COPY --from=builder /bin/budget-planner /app/budget-planner
 COPY --from=builder /build/config.env .
 # COPY --from=builder config.env /app
 
+EXPOSE 8080 8080
 CMD ["./budget-planner"]

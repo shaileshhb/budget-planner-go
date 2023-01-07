@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    hostname: api
+    volumes:
+      - ./logs/:/logs/
+    env_file: dev-config.env
+    ports:
+      - "8080:8080"
+    # depends_on:
+    #   - db
+
+  elasticsearch:
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:8.5.3'
+    ports:
+      - "9200:9200"
+    environment:
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=sVUurmsWYEwnliUxp3pX
+      # - discovery.type=single-node
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-s",
+          "-f",
+          "http://localhost:9200/_cat/health"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - ./elk-stack/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.5.3
+    volumes:
+      - ./elk-stack/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+  
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.5.1
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    # volumes:
+    #   - ./elk-stack/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    #   - ./logs/:/logs/
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.5.3
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - ELASTICSEARCH_USERNAME="kibana_system"
+      - ELASTICSEARCH_PASSWORD="sVUurmsWYEwnliUxp3pX"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-s",
+          "-f",
+          "http://localhost:5601/api/status"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 50
+    ports:
+      - 5601:5601
