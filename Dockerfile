@@ -1,0 +1,33 @@
+FROM golang:1.17-alpine AS builder
+LABEL stage=gobuilder
+
+ENV CGO_ENABLED 0
+ENV GOOS linux
+
+RUN apk update --no-cache && apk add --no-cache tzdata
+WORKDIR /build
+
+ADD go.mod .
+ADD go.sum .
+
+RUN go mod download
+COPY . .
+
+# for production.
+RUN go build -ldflags="-s -w -X main.production=true" -o /bin/budget-planner
+# RUN go build -ldflags="-s -w" -o /bin/budget-planner
+
+FROM alpine
+
+RUN apk update --no-cache && apk add --no-cache ca-certificates
+
+COPY --from=builder /usr/share/zoneinfo/Asia/Kolkata /usr/share/zoneinfo/Asia/Kolkata 
+ENV TZ Asia/Kolkata
+
+WORKDIR /app
+COPY --from=builder /bin/budget-planner /app/budget-planner
+COPY --from=builder /build/config.env .
+# COPY --from=builder config.env /app
+
+EXPOSE 8080 8080
+CMD ["./budget-planner"]

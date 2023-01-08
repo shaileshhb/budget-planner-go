@@ -1,0 +1,42 @@
+{
+  "@timestamp": "2023-01-08T19:20:35+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(host.docker.internal:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-08T19:20:35+05:30",
+  "file": "\u001b[93m[app.go:65]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[InitializeRouter]\u001b[0m",
+  "level": "info",
+  "message": "Money wisely App Route initializing"
+}
+{
+  "@timestamp": "2023-01-08T19:20:36+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:35]\u001b[0m\u001b[95m[user]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "User Module Configured."
+}
+{
+  "@timestamp": "2023-01-08T19:20:36+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:50]\u001b[0m\u001b[95m[envelop]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "Envelop Module Configured."
+}
+{
+  "@timestamp": "2023-01-08T19:20:36+05:30",
+  "file": "\u001b[93m[app.go:121]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[MigrateTables]\u001b[0m",
+  "level": "info",
+  "message": "End of Migration"
+}
+{
+  "@timestamp": "2023-01-08T19:20:36+05:30",
+  "file": "\u001b[93m[app.go:131]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Time: 2023-01-08 19:20:36.4821597 +0530 IST m=+0.541898301"
+}
+{
+  "@timestamp": "2023-01-08T19:20:36+05:30",
+  "file": "\u001b[93m[app.go:132]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Running on port: 8080"
+}
