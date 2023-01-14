@@ -84,7 +84,7 @@ func (c *transactionController) addTransaction(ctx *gin.Context) {
 		return
 	}
 
-	web.RespondJSON(ctx, http.StatusAccepted, nil)
+	web.RespondJSON(ctx, http.StatusCreated, nil)
 }
 
 // updateTransaction will update specified transaction of user.

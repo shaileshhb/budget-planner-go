@@ -84,7 +84,7 @@ func (c *envelopController) addEnvelop(ctx *gin.Context) {
 		return
 	}
 
-	web.RespondJSON(ctx, http.StatusAccepted, nil)
+	web.RespondJSON(ctx, http.StatusCreated, nil)
 }
 
 // updateEnvelop will update specified envelop.
