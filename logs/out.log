@@ -40,3 +40,261 @@
   "level": "info",
   "message": "Server Running on port: 8080"
 }
+{
+  "@timestamp": "2023-01-09T13:15:12+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(host.docker.internal:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-09T13:15:33+05:30",
+  "file": "\u001b[93m[Connect.go:30]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "error",
+  "message": "dial tcp 192.168.0.107:3306: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond."
+}
+{
+  "@timestamp": "2023-01-09T13:15:33+05:30",
+  "file": "\u001b[93m[main.go:42]\u001b[0m\u001b[95m[main]\u001b[0m\u001b[36m[main]\u001b[0m",
+  "level": "fatal",
+  "message": "Db connection failed."
+}
+{
+  "@timestamp": "2023-01-09T13:15:59+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(host.docker.internal:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-09T13:16:20+05:30",
+  "file": "\u001b[93m[Connect.go:30]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "error",
+  "message": "dial tcp 192.168.0.107:3306: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond."
+}
+{
+  "@timestamp": "2023-01-09T13:16:20+05:30",
+  "file": "\u001b[93m[main.go:42]\u001b[0m\u001b[95m[main]\u001b[0m\u001b[36m[main]\u001b[0m",
+  "level": "fatal",
+  "message": "Db connection failed."
+}
+{
+  "@timestamp": "2023-01-09T13:16:47+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(127.0.0.1:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-09T13:16:47+05:30",
+  "file": "\u001b[93m[app.go:65]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[InitializeRouter]\u001b[0m",
+  "level": "info",
+  "message": "Money wisely App Route initializing"
+}
+{
+  "@timestamp": "2023-01-09T13:16:47+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:35]\u001b[0m\u001b[95m[user]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "User Module Configured."
+}
+{
+  "@timestamp": "2023-01-09T13:16:48+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:50]\u001b[0m\u001b[95m[envelop]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "Envelop Module Configured."
+}
+{
+  "@timestamp": "2023-01-09T13:16:48+05:30",
+  "file": "\u001b[93m[app.go:121]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[MigrateTables]\u001b[0m",
+  "level": "info",
+  "message": "End of Migration"
+}
+{
+  "@timestamp": "2023-01-09T13:16:48+05:30",
+  "file": "\u001b[93m[app.go:131]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Time: 2023-01-09 13:16:48.0401946 +0530 IST m=+0.578135801"
+}
+{
+  "@timestamp": "2023-01-09T13:16:48+05:30",
+  "file": "\u001b[93m[app.go:132]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Running on port: 8080"
+}
+{
+  "@timestamp": "2023-01-09T13:17:08+05:30",
+  "file": "\u001b[93m[Authentication.go:81]\u001b[0m\u001b[95m[security]\u001b[0m\u001b[36m[func1]\u001b[0m",
+  "level": "error",
+  "message": "token is expired by 135h48m8.4230713s"
+}
+{
+  "@timestamp": "2023-01-14T11:32:01+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(127.0.0.1:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-14T11:32:01+05:30",
+  "file": "\u001b[93m[app.go:65]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[InitializeRouter]\u001b[0m",
+  "level": "info",
+  "message": "Money wisely App Route initializing"
+}
+{
+  "@timestamp": "2023-01-14T11:32:01+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:35]\u001b[0m\u001b[95m[user]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "User Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T11:32:02+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:50]\u001b[0m\u001b[95m[envelop]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "Envelop Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T11:32:02+05:30",
+  "file": "\u001b[93m[app.go:121]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[MigrateTables]\u001b[0m",
+  "level": "info",
+  "message": "End of Migration"
+}
+{
+  "@timestamp": "2023-01-14T11:32:02+05:30",
+  "file": "\u001b[93m[app.go:131]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Time: 2023-01-14 11:32:02.1410212 +0530 IST m=+0.465371301"
+}
+{
+  "@timestamp": "2023-01-14T11:32:02+05:30",
+  "file": "\u001b[93m[app.go:132]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Running on port: 8080"
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(127.0.0.1:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[app.go:65]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[InitializeRouter]\u001b[0m",
+  "level": "info",
+  "message": "Money wisely App Route initializing"
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:35]\u001b[0m\u001b[95m[user]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "User Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:50]\u001b[0m\u001b[95m[envelop]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "Envelop Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[app.go:121]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[MigrateTables]\u001b[0m",
+  "level": "info",
+  "message": "End of Migration"
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[app.go:131]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Time: 2023-01-14 13:06:45.6322571 +0530 IST m=+0.361367801"
+}
+{
+  "@timestamp": "2023-01-14T13:06:45+05:30",
+  "file": "\u001b[93m[app.go:132]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Running on port: 8080"
+}
+{
+  "@timestamp": "2023-01-14T13:46:58+05:30",
+  "file": "\u001b[93m[Connect.go:19]\u001b[0m\u001b[95m[db]\u001b[0m\u001b[36m[NewDBConnection]\u001b[0m",
+  "level": "info",
+  "message": "HERE IS THE OPEN URL: root:*****@tcp(127.0.0.1:3306)/budget-planner?charset=utf8mb4\u0026parseTime=true\n"
+}
+{
+  "@timestamp": "2023-01-14T13:46:58+05:30",
+  "file": "\u001b[93m[app.go:65]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[InitializeRouter]\u001b[0m",
+  "level": "info",
+  "message": "Money wisely App Route initializing"
+}
+{
+  "@timestamp": "2023-01-14T13:46:59+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:35]\u001b[0m\u001b[95m[user]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "User Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T13:47:00+05:30",
+  "file": "\u001b[93m[ModuleConfig.go:50]\u001b[0m\u001b[95m[envelop]\u001b[0m\u001b[36m[TableMigration]\u001b[0m",
+  "level": "info",
+  "message": "Envelop Module Configured."
+}
+{
+  "@timestamp": "2023-01-14T13:47:00+05:30",
+  "file": "\u001b[93m[app.go:121]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[MigrateTables]\u001b[0m",
+  "level": "info",
+  "message": "End of Migration"
+}
+{
+  "@timestamp": "2023-01-14T13:47:00+05:30",
+  "file": "\u001b[93m[app.go:131]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Time: 2023-01-14 13:47:00.0450668 +0530 IST m=+1.407159201"
+}
+{
+  "@timestamp": "2023-01-14T13:47:00+05:30",
+  "file": "\u001b[93m[app.go:132]\u001b[0m\u001b[95m[budgetplanner]\u001b[0m\u001b[36m[Start]\u001b[0m",
+  "level": "info",
+  "message": "Server Running on port: 8080"
+}
+{
+  "@timestamp": "2023-01-14T13:47:28+05:30",
+  "file": "\u001b[93m[Envelop.go:184]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[getEnvelops]\u001b[0m",
+  "level": "error",
+  "message": "User not found"
+}
+{
+  "@timestamp": "2023-01-14T13:47:33+05:30",
+  "file": "\u001b[93m[Auth.go:168]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[getUser]\u001b[0m",
+  "level": "error",
+  "message": "User not found"
+}
+{
+  "@timestamp": "2023-01-14T13:57:54+05:30",
+  "file": "\u001b[93m[Auth.go:168]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[getUser]\u001b[0m",
+  "level": "error",
+  "message": "User not found"
+}
+{
+  "@timestamp": "2023-01-14T13:59:07+05:30",
+  "file": "\u001b[93m[Auth.go:168]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[getUser]\u001b[0m",
+  "level": "error",
+  "message": "User not found"
+}
+{
+  "@timestamp": "2023-01-14T14:48:00+05:30",
+  "file": "\u001b[93m[Envelop.go:112]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[updateEnvelop]\u001b[0m",
+  "level": "error",
+  "message": "invalid UUID length: 4"
+}
+{
+  "@timestamp": "2023-01-14T14:49:07+05:30",
+  "file": "\u001b[93m[Envelop.go:112]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[updateEnvelop]\u001b[0m",
+  "level": "error",
+  "message": "invalid UUID length: 4"
+}
+{
+  "@timestamp": "2023-01-14T14:49:08+05:30",
+  "file": "\u001b[93m[Envelop.go:112]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[updateEnvelop]\u001b[0m",
+  "level": "error",
+  "message": "invalid UUID length: 4"
+}
+{
+  "@timestamp": "2023-01-14T14:49:12+05:30",
+  "file": "\u001b[93m[Envelop.go:112]\u001b[0m\u001b[95m[controller]\u001b[0m\u001b[36m[updateEnvelop]\u001b[0m",
+  "level": "error",
+  "message": "invalid UUID length: 4"
+}

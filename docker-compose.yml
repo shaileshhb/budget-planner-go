@@ -50,8 +50,6 @@ services:
     depends_on:
       - logstash
       - elasticsearch
-        # condition: 
-        # condition: service_healthy
     volumes:
       - ./elk-stack/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./logs/:/logs/
