@@ -126,12 +126,12 @@ func (c *authenticationController) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	user.UpdatedBy, err = c.auth.ExtractUserID(ctx)
-	if err != nil {
-		c.log.Error(err)
-		web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
+	// user.ID, err = c.auth.ExtractUserID(ctx)
+	// if err != nil {
+	// 	c.log.Error(err)
+	// 	web.RespondErrorMessage(ctx, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
 
 	err = user.ValidateUser()
 	if err != nil {

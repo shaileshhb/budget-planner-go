@@ -68,7 +68,7 @@ func (c *envelopController) addEnvelop(ctx *gin.Context) {
 		return
 	}
 
-	envelop.CreatedBy = envelop.UserID
+	// envelop.CreatedBy = envelop.UserID
 
 	err = envelop.Validate()
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *envelopController) updateEnvelop(ctx *gin.Context) {
 		return
 	}
 
-	envelop.UpdatedBy = envelop.UserID
+	// envelop.UpdatedBy = envelop.UserID
 
 	err = envelop.Validate()
 	if err != nil {
@@ -154,7 +154,7 @@ func (c *envelopController) deleteEnvelop(ctx *gin.Context) {
 		return
 	}
 
-	envelop.DeletedBy = envelop.UserID
+	// envelop.DeletedBy = envelop.UserID
 
 	err = c.service.DeleteEnvelop(&envelop)
 	if err != nil {

@@ -68,7 +68,7 @@ func (c *transactionController) addTransaction(ctx *gin.Context) {
 		return
 	}
 
-	transaction.CreatedBy = transaction.UserID
+	// transaction.CreatedBy = transaction.UserID
 
 	err = transaction.Validate()
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *transactionController) updateTransaction(ctx *gin.Context) {
 		return
 	}
 
-	transaction.UpdatedBy = transaction.UserID
+	// transaction.UpdatedBy = transaction.UserID
 
 	err = transaction.Validate()
 	if err != nil {
@@ -154,7 +154,7 @@ func (c *transactionController) deleteTransaction(ctx *gin.Context) {
 		return
 	}
 
-	transaction.DeletedBy = transaction.UserID
+	// transaction.DeletedBy = transaction.UserID
 
 	err = c.service.DeleteTransaction(&transaction)
 	if err != nil {

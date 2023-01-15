@@ -143,7 +143,7 @@ func (ser *authenticationService) UpdateUser(user *userModal.User) error {
 		return err
 	}
 
-	user.CreatedBy = tempUser.CreatedBy
+	// user.CreatedBy = tempUser.CreatedBy
 	user.Password = tempUser.Password
 
 	err = ser.repo.Save(uow, &user)

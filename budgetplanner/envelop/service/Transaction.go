@@ -94,8 +94,6 @@ func (ser *transactionService) UpdateTransaction(transaction *envelopModel.Trans
 		return err
 	}
 
-	transaction.CreatedBy = tempTransaction.CreatedBy
-
 	err = ser.repo.Save(uow, transaction)
 	if err != nil {
 		return err

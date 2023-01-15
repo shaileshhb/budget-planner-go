@@ -109,7 +109,7 @@ func (ser *envelopService) DeleteEnvelop(envelop *envelopModel.Envelop) error {
 
 	// using update because there is no nullable field in envelops table
 	err = ser.repo.UpdateWithMap(uow, envelopModel.Envelop{}, map[string]interface{}{
-		"DeletedBy": envelop.DeletedBy,
+		// "DeletedBy": envelop.DeletedBy,
 		"DeletedAt": time.Now(),
 	}, repository.Filter("envelops.`id` = ?", envelop.ID))
 	if err != nil {
