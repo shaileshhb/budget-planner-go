@@ -138,7 +138,7 @@ func (ser *authenticationService) UpdateUser(user *userModal.User) error {
 	tempUser := userModal.User{}
 
 	err = ser.repo.GetRecord(uow, &tempUser, repository.Filter("users.`id` = ?", user.ID),
-		repository.Select("`created_by`, `password`"))
+		repository.Select("`created_at`, `password`"))
 	if err != nil {
 		return err
 	}

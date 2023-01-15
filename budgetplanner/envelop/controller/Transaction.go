@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -135,7 +136,7 @@ func (c *transactionController) updateTransaction(ctx *gin.Context) {
 
 // deleteTransaction will delete specified transaction of user.
 func (c *transactionController) deleteTransaction(ctx *gin.Context) {
-
+	fmt.Println(" ================== deleteTransaction ================== ")
 	transaction := envelopModel.Transaction{}
 	parser := web.NewParser(ctx)
 	var err error

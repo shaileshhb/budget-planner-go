@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/url"
 	"time"
 
@@ -89,7 +90,7 @@ func (ser *transactionService) UpdateTransaction(transaction *envelopModel.Trans
 	tempTransaction := envelopModel.Transaction{}
 
 	err = ser.repo.GetRecord(uow, &tempTransaction, repository.Filter("`id` = ?", transaction.ID),
-		repository.Select("`created_by`"))
+		repository.Select("`created_at`"))
 	if err != nil {
 		return err
 	}
@@ -119,9 +120,10 @@ func (ser *transactionService) DeleteTransaction(transaction *envelopModel.Trans
 	uow := repository.NewUnitOfWork(ser.db)
 	defer uow.RollBack()
 
+	fmt.Println(" ================= deleting...")
+
 	err = ser.repo.UpdateWithMap(uow, transaction, map[string]interface{}{
 		"DeletedAt": time.Now(),
-		"DeletedBy": transaction.UserID,
 	}, repository.Filter("`id` = ?", transaction.ID))
 	if err != nil {
 		return err
@@ -147,7 +149,8 @@ func (ser *transactionService) GetUserTransaction(transactions *[]envelopModel.T
 
 	err = ser.repo.GetAllInOrder(uow, transactions, "transactions.`date` DESC",
 		ser.addSearchQueries(parser.Form), repository.PreloadAssociations([]string{"Envelop"}),
-		repository.Filter("transactions.`user_id` = ?", userID), repository.Paginate(limit, offset, totalCount))
+		repository.Filter("transactions.`user_id` = ? AND transactions.`deleted_at` IS NULL", userID),
+		repository.Paginate(limit, offset, totalCount))
 	if err != nil {
 		return err
 	}

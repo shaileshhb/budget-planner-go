@@ -106,12 +106,12 @@ func (repository *GormRepository) GetCountUnscoped(uow *UnitOfWork, out interfac
 
 // Add adds record to table.
 func (repository *GormRepository) Add(uow *UnitOfWork, out interface{}) error {
-	return uow.DB.Create(out).Error
+	return uow.DB.Debug().Create(out).Error
 }
 
 // Update updates the record in table.
 func (repository *GormRepository) Updates(uow *UnitOfWork, out interface{}) error {
-	return uow.DB.Model(out).Updates(out).Error
+	return uow.DB.Debug().Model(out).Updates(out).Error
 }
 
 // UpdateWithMap updates the record in table using map.
@@ -133,22 +133,22 @@ func (repository *GormRepository) UpdateWithMap(uow *UnitOfWork, model interface
 
 // Save updates the record in table. If value doesn't have primary key, new record will be inserted.
 func (repository *GormRepository) Save(uow *UnitOfWork, value interface{}) error {
-	return uow.DB.Save(value).Error
+	return uow.DB.Debug().Save(value).Error
 }
 
 // Delete deletes a record from table.
 func (repository *GormRepository) Delete(uow *UnitOfWork, out interface{}, where ...interface{}) error {
-	return uow.DB.Delete(out, where...).Error
+	return uow.DB.Debug().Delete(out, where...).Error
 }
 
 // ReplaceAssociations replaces associations from the given entity.
 func (repository *GormRepository) ReplaceAssociations(uow *UnitOfWork, out interface{}, associationName string, associations ...interface{}) error {
-	return uow.DB.Model(out).Association(associationName).Replace(associations...)
+	return uow.DB.Debug().Model(out).Association(associationName).Replace(associations...)
 }
 
 // RemoveAssociations removes associations from the given entity.
 func (repository *GormRepository) RemoveAssociations(uow *UnitOfWork, out interface{}, associationName string, associations ...interface{}) error {
-	return uow.DB.Model(out).Association(associationName).Delete(associations...)
+	return uow.DB.Debug().Model(out).Association(associationName).Delete(associations...)
 }
 
 // Scan will fill the out interface with data(fields) based on the given QP conditions.
@@ -158,7 +158,7 @@ func (repository *GormRepository) Scan(uow *UnitOfWork, out interface{}, queryPr
 	if err != nil {
 		return err
 	}
-	return db.Scan(out).Error
+	return db.Debug().Scan(out).Error
 }
 
 // ******************************** All GormRepository methods above this line ********************************
